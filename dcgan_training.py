@@ -23,11 +23,11 @@ random.seed(manualSeed)
 torch.manual_seed(manualSeed)
 
 # Root directory for dataset
-dataroot = "Data_PNG"
+dataroot = "Data_Augmented"
 # Number of workers for dataloader
 workers = 2
 # Batch size during training
-batch_size = 128
+batch_size = 16
 # Spatial size of training images. All images will be resized to this
 # size using a transformer.
 image_size = 64
@@ -40,7 +40,7 @@ ngf = 64
 # Size of feature maps in discriminator
 ndf = 64
 # Number of training epochs
-num_epochs = 1000
+num_epochs = 5
 # Learning rate for optimizers
 lr = 2 * 1e-4
 # Beta1 hyperparam for Adam optimizers
@@ -57,6 +57,8 @@ dataset = dset.ImageFolder(root=dataroot,
                                transforms.ToTensor(),
                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                            ]))
+
+# print(dataset.targets)
 # Create the dataloader
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                          shuffle=True, num_workers=workers)
@@ -251,10 +253,10 @@ for epoch in tqdm.tqdm(range(num_epochs)):
         optimizerG.step()
 
         # Output training stats
-        # if i % 50 == 0:
-        #     print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
-        #           % (epoch, num_epochs, i, len(dataloader),
-        #              errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
+        if i % 50 == 0:
+            print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
+                  % (epoch, num_epochs, i, len(dataloader),
+                     errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
 
         # Save Losses for plotting later
         G_losses.append(errG.item())
