@@ -11,10 +11,10 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 path = "Data_PNG"
-out_path = "Data_Augmented_2"
+out_path = "Data_Augmented_90k"
 cell_types = ["HSIL", "LSIL", "NSIL"]
 
-target_amount = 1000
+target_amount = 30000
 
 print(f"Starting data augmentation...")
 for type in cell_types:

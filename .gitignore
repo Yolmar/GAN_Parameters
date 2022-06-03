@@ -131,4 +131,6 @@ dmypy.json
 # Data Images too large...
 Dane/
 Data_PNG/
-Data_Augmented/
+Data_Augmented_3k/
+Data_Augmented_30k/
+Data_Augmented_90k/

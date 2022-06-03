@@ -16,18 +16,18 @@ import matplotlib.animation as animation
 from IPython.display import HTML
 import tqdm as tqdm
 
-manualSeed = 1243
+manualSeed = 28180
 
 print(f"Random seed: {manualSeed}")
 random.seed(manualSeed)
 torch.manual_seed(manualSeed)
 
 # Root directory for dataset
-dataroot = "Data_Augmented"
+dataroot = "Data_Augmented_90k"
 # Number of workers for dataloader
 workers = 2
 # Batch size during training
-batch_size = 16
+batch_size = 64
 # Spatial size of training images. All images will be resized to this
 # size using a transformer.
 image_size = 64
