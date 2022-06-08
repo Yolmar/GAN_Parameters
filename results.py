@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 from dcgan import Generator
 
 # Root directory for dataset
-data_name = "NSIL_Original"
+data_name = "Data_PNG"
 epoch_snapshot = [1, 10, 20, 30, 40, 50, 70, 80, 90, 100]
 batch_sizes = [8, 16, 32, 64, 128, 256]
-lrs = [2*1e-4, 1e4, 2*1e5, 1e5]
+lrs = [2*1e-4, 1e-4, 2*1e-5, 1e-5]
 
 for lr in lrs:
     for batch_size in batch_sizes:
@@ -45,16 +45,16 @@ for lr in lrs:
                     generated_img = netG(noise).detach().cpu()
 
                 # Display the generated image.
-                plt.figure(figsize=(20,10))
+                plt.figure(figsize=(10,10))
                 plt.axis("off")
                 plt.title("Generated Images")
                 plt.imshow(np.transpose(vutils.make_grid(generated_img, padding=2, normalize=True), (1,2,0)))
 
-                save_path = f'Plots&Images/{data_name}/Generated_Images/b{batch_size}'
+                save_path = f'Plots&Images/{data_name}/Generated_Images/lr{lr}/b{batch_size}'
                 isExist = os.path.exists(save_path)
                 if not isExist:
                     os.makedirs(save_path)
-                plt.savefig(f'{save_path}/lr{lr}/e{epoch}.png')
+                plt.savefig(f'{save_path}/e{epoch}.png')
 
                 plt.clf()
 
