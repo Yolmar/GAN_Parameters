@@ -182,10 +182,10 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
         epoch_snapshot = [1, 5, 10, 20, 30, 40, 50, 70, 80, 90, 100]
         for snap in epoch_snapshot:
             if epoch + 1 == snap:
-                isExist = os.path.exists(f'Models/{data_name}')
+                save_path = f'Models/{data_name}/lr{lr}/b{batch_size}'
+                isExist = os.path.exists(save_path)
                 if not isExist:
-                    os.makedirs(f'Models/{data_name}')
-
+                    os.makedirs(save_path)
                 torch.save({
                             'generator' : netG.state_dict(),
                             'discriminator' : netD.state_dict(),
@@ -194,5 +194,5 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
                             'GLosses': G_losses,
                             'DLosses': D_losses,
                             'params' : parameters
-                            }, f'Models/{data_name}/b{batch_size}_e{snap}.pth')
+                            }, f'{save_path}/e{snap}.pth')
                 print(f'Epoch {snap} saved...')

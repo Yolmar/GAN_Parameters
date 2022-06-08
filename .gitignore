@@ -131,3 +131,4 @@ dmypy.json
 # Data Images too large...
 Data/
 Models/
+Plots&Images/
