@@ -15,9 +15,10 @@ import tqdm as tqdm
 from dcgan import Generator, Discriminator, weights_init
 
 def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
-                num_epochs=100, lr=2*1e-4):
+                num_epochs=70, g_lr=1e-4, d_lr=2*1e-4, nz=100, beta1=0.5, experiment_name='Test'):
 
     print(f"Random seed: {manualSeed}")
+    print(f"Dataset: {data_name}")
     random.seed(manualSeed)
     torch.manual_seed(manualSeed)
 
@@ -31,14 +32,12 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
     #   size using a transformer.
     image_size = 64
 
-    # Beta1 hyperparam for Adam optimizers
-    beta1 = 0.5
     # Number of GPUs available. Use 0 for CPU mode.
     ngpu = 1
 
     parameters = {
         'nc': 3,    # Number of channels in the training images. For color images this is 3
-        'nz': 100,  # Size of z latent vector (i.e. size of generator input)
+        'nz': nz,  # Size of z latent vector (i.e. size of generator input)
         'ngf': 64,  # Size of feature maps in generator
         'ndf': 64,  # Size of feature maps in discriminator
     }
@@ -59,10 +58,7 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
 
     # Decide which device we want to run on
     device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
-    print("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
-
-    # Plot some training images
-    real_batch = next(iter(dataloader))
+    # print("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
     # Create the generator
     netG = Generator(parameters).to(device)
@@ -82,6 +78,7 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
 
     # Initialize BCELoss function
     criterion = nn.BCELoss()
+    # criterion = nn.MSELoss()
 
     # Create batch of latent vectors that we will use to visualize
     #  the progression of the generator
@@ -92,8 +89,8 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
     fake_label = 0.
 
     # Setup Adam optimizers for both G and D
-    optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, 0.999))
-    optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
+    optimizerD = optim.Adam(netD.parameters(), lr=d_lr, betas=(beta1, 0.999))
+    optimizerG = optim.Adam(netG.parameters(), lr=g_lr, betas=(beta1, 0.999))
 
     # Training Loop
 
@@ -145,6 +142,7 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
             # Update D
             optimizerD.step()
 
+
             ############################
             # (2) Update G network: maximize log(D(G(z)))
             ###########################
@@ -160,15 +158,15 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
             # Update G
             optimizerG.step()
 
-            # Output training stats
-            if i % 50 == 0:
-                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
-                    % (epoch, num_epochs, i, len(dataloader),
-                        errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
-
             # Save Losses for plotting later
             G_losses.append(errG.item())
             D_losses.append(errD.item())
+            
+            # Output training stats
+            if i % 50 == 0:
+                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f\t'
+                    % (epoch, num_epochs, i, len(dataloader),
+                        errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
 
             # Check how the generator is doing by saving G's output on fixed_noise
             if (iters % 500 == 0) or ((epoch == num_epochs - 1) and (i == len(dataloader) - 1)):
@@ -179,10 +177,10 @@ def train_model(manualSeed=28180, data_name='Data_PNG', batch_size=128,
             iters += 1
 
         # Save model at specified epoch.
-        epoch_snapshot = [1, 5, 10, 20, 30, 40, 50, 70, 80, 90, 100]
+        epoch_snapshot = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         for snap in epoch_snapshot:
             if epoch + 1 == snap:
-                save_path = f'Models/{data_name}/lr{lr}/b{batch_size}'
+                save_path = f'Models/{experiment_name}'
                 isExist = os.path.exists(save_path)
                 if not isExist:
                     os.makedirs(save_path)
